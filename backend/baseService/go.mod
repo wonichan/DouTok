@@ -17,6 +17,8 @@ require (
 	google.golang.org/genproto v0.0.0-20250313205543-e70fdf4c4cb4 // indirect
 )
 
+replace DouTok-example/backend/common v0.0.0-00010101000000-000000000000 => ../common
+
 require (
 	github.com/bytedance/gopkg v0.1.1 // indirect
 	github.com/bytedance/sonic v1.12.7 // indirect

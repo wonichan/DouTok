@@ -7,5 +7,8 @@ import (
 
 func main() {
 	c := &conf.Config{}
-	launcher.New()
+	launcher := launcher.New(
+		launcher.WithConfig(c),
+	)
+	launcher.Run()
 }

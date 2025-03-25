@@ -1,6 +1,7 @@
 package launcher
 
 type Launcher struct {
+	configValue interface{}
 }
 
 func New(options ...Option) *Launcher {
