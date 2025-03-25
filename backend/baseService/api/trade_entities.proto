@@ -1,7 +1,7 @@
 syntax = "proto3";
 package api;
 
-option go_package = "github.com/cloudzenith/DouTok/...;api";
+option go_package = "api";
 
 import "buf/validate/validate.proto";
 
