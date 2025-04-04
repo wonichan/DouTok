@@ -1,0 +1,13 @@
+@host = http://127.0.0.1:8000
+
+POST {{{host}}}/v1/store
+Content-Type: application/json
+
+{
+    "key": "test5",
+    "value": "100"
+}
+
+
+GET {{{host}}}/v1/get/test11
+Accept: application/json

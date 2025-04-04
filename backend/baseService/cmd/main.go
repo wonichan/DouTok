@@ -1,14 +1,12 @@
 package main
 
 import (
-	"DouTok-example/backend/baseService/internal/conf"
-	"DouTok-example/backend/common/launcher"
+	"DouTok-example/backend/baseService/internal/config"
+	"DouTok-example/backend/baseService/launcher"
 )
 
 func main() {
-	c := &conf.Config{}
-	launcher := launcher.New(
-		launcher.WithConfig(c),
-	)
+	config.Init()
+	launcher := launcher.New()
 	launcher.Run()
 }
