@@ -5,49 +5,50 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/common/json"
 
+	"DouTok-example/backend/baseService/internal/cache/config"
 	"DouTok-example/backend/baseService/internal/cache/constants"
 	"DouTok-example/backend/baseService/internal/cache/types"
 )
 
 var (
-	cacheCluster *CacheCluster
-	once         sync.Once
+	cacheGroup *CacheGroup
+	once       sync.Once
+)
+
+const (
+	selfNode = "node1"
 )
 
 func init() {
 	once.Do(func() {
-		cacheCluster = NewCacheCluster()
+		cacheGroup = NewCacheGroup("test", config.WithCacheSize(1000))
 		RegisterNode()
 	})
 }
 
 func RegisterNode() {
-	var nodes []*CacheNode
-	// TODO 从配置文件中读取节点信息
-	nodes = append(nodes,
-		NewCacheNode("node1", defaultReplicas, 1000, nil),
-		NewCacheNode("node2", defaultReplicas, 1000, nil),
-		NewCacheNode("node3", defaultReplicas, 1000, nil),
-	)
-	cacheCluster.AddNodes(nodes...)
+	addrs := []string{
+		"node1",
+		"node2",
+		"node3",
+	}
+	cacheGroup.RegisterNode(NewCacheNodesPool().AddNodes(addrs...))
 }
 
 func Get(c context.Context, ctx *app.RequestContext) {
 	key := ctx.Param(constants.Key_param)
-	cacheNode := cacheCluster.GetNode(key)
-
-	data, ok := cacheNode.Get(key)
+	data, ok := cacheGroup.Get(key)
 	if !ok {
-		hlog.Infof("key:%s not found", key)
-		ctx.WriteString(fmt.Sprintf("key[%s] not found", key))
+		ctx.WriteString(fmt.Sprintf("key:%s not found", key))
 		return
 	}
-	ctx.JSON(http.StatusOK, &types.Entry{Key: key, Value: data.String()})
+	ctx.JSON(http.StatusOK, data)
 }
 
 func Store(c context.Context, ctx *app.RequestContext) {
@@ -64,7 +65,6 @@ func Store(c context.Context, ctx *app.RequestContext) {
 
 	var data types.Entry
 	_ = json.Unmarshal(body, &data)
-	cacheNode := cacheCluster.GetNode(data.Key)
-	cacheNode.Set(data.Key, types.ByteView(data.Value))
+	cacheGroup.Set(types.NewKvStore(data.Key, types.ByteView(data.Value), time.Duration(data.TTL)*time.Second))
 	ctx.JSON(http.StatusOK, data)
 }

@@ -1,16 +1,25 @@
 package types
 
 type Getter interface {
-	Get(key string) (ByteView, bool)
+	Get(key string) (*KvStore, error)
 }
 
-type GetterFunc func(key string) (ByteView, bool)
+type GetterFunc func(key string) (*KvStore, error)
 
-func (f GetterFunc) Get(key string) (ByteView, bool) {
+func (f GetterFunc) Get(key string) (*KvStore, error) {
 	return f(key)
+}
+
+type PeerPicker interface {
+	PickPeer(key string) (peer PeerGetter, ok bool)
+}
+
+type PeerGetter interface {
+	Get(group string, key string) ([]byte, error)
 }
 
 type Entry struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
+	TTL   int64  `json:"ttl"`
 }

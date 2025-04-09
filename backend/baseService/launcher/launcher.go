@@ -35,7 +35,8 @@ func beginStart(ctx context.Context) error {
 
 func (l *Launcher) Run() {
 	// 注册路由
-	l.serverHertz.Use(accesslog.New(accesslog.WithFormat("[${time}] ${status} - ${latency} ${method} ${path} ${queryParams}")))
+	l.serverHertz.Use(
+		accesslog.New(accesslog.WithFormat("[${time}] ${status} - ${latency} ${method} ${path} ${queryParams}")))
 	router.RegisterRouter(l.serverHertz)
 	l.serverHertz.Spin()
 }
