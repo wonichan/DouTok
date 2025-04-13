@@ -17,38 +17,46 @@ import (
 )
 
 var (
-	cacheGroup *CacheGroup
-	once       sync.Once
+	once sync.Once
 )
 
 const (
-	selfNode = "node1"
+	selfGroup = "test"
+	selfNode  = "127.0.0.1:9001"
 )
 
 func init() {
 	once.Do(func() {
-		cacheGroup = NewCacheGroup("test", config.WithCacheSize(1000))
+		NewCacheGroupPool("test", config.WithCacheSize(1000))
 		RegisterNode()
 	})
 }
 
 func RegisterNode() {
 	addrs := []string{
-		"node1",
-		"node2",
-		"node3",
+		"127.0.0.1:9000",
+		"127.0.0.1:9001",
 	}
-	cacheGroup.RegisterNode(NewCacheNodesPool().AddNodes(addrs...))
+	cacheNodePool := NewCacheNodesPool()
+	cacheNodePool.AddNodes(addrs...)
+	GetCacheGroup(selfGroup).RegisterNode(cacheNodePool)
+	cacheNodePool.startRPCServer()
 }
 
 func Get(c context.Context, ctx *app.RequestContext) {
+	group := ctx.Param(constants.Group_param)
 	key := ctx.Param(constants.Key_param)
-	data, ok := cacheGroup.Get(key)
+	data, ok := GetCacheGroup(group).Get(key)
 	if !ok {
 		ctx.WriteString(fmt.Sprintf("key:%s not found", key))
 		return
 	}
-	ctx.JSON(http.StatusOK, data)
+	res := &types.Entry{
+		Key:   key,
+		Value: string(data.Value),
+		TTL:   int64(data.LifeTime.Seconds()),
+	}
+	ctx.JSON(http.StatusOK, res)
 }
 
 func Store(c context.Context, ctx *app.RequestContext) {
@@ -65,6 +73,6 @@ func Store(c context.Context, ctx *app.RequestContext) {
 
 	var data types.Entry
 	_ = json.Unmarshal(body, &data)
-	cacheGroup.Set(types.NewKvStore(data.Key, types.ByteView(data.Value), time.Duration(data.TTL)*time.Second))
+	GetCacheGroup(data.Group).Set(types.NewKvStore(data.Key, types.ByteView(data.Value), time.Duration(data.TTL)*time.Second))
 	ctx.JSON(http.StatusOK, data)
 }

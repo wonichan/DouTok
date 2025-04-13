@@ -6,10 +6,28 @@ import (
 	"DouTok-example/backend/baseService/internal/cache/types"
 	"DouTok-example/backend/baseService/internal/logger"
 	"context"
+	"sync"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/common/json"
 )
+
+var (
+	mu     sync.RWMutex
+	groups = make(map[string]*CacheGroup)
+)
+
+func NewCacheGroupPool(name string, opts ...config.Option) {
+	mu.Lock()
+	defer mu.Unlock()
+	groups[name] = NewCacheGroup(name, opts...)
+}
+
+func GetCacheGroup(name string) *CacheGroup {
+	mu.RLock()
+	defer mu.RUnlock()
+	return groups[name]
+}
 
 type CacheGroup struct {
 	name      string
@@ -64,7 +82,7 @@ func (cg *CacheGroup) load(key string) (*types.KvStore, bool) {
 	if err != nil {
 		return nil, false
 	}
-	return kv, false
+	return kv, true
 }
 
 func (cg *CacheGroup) getLocally(key string) (*types.KvStore, error) {
@@ -83,6 +101,7 @@ func (cg *CacheGroup) getLocally(key string) (*types.KvStore, error) {
 func (cg *CacheGroup) getFromPeer(peer types.PeerGetter, key string) (*types.KvStore, error) {
 	byte, err := peer.Get(cg.name, key)
 	if err != nil {
+		logger.GetLogger().Errorf("get cache from peer failed: %v", err)
 		return nil, err
 	}
 	kv := &types.KvStore{}

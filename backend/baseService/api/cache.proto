@@ -1,0 +1,17 @@
+syntax = "proto3";
+package api;
+
+option go_package = "api";
+
+message cacheRequest {
+    string group = 1;
+    string key = 2;
+}
+
+message cacheResponse {
+    bytes value = 1; 
+}
+
+service CacheService {
+    rpc GetKV(cacheRequest) returns (cacheResponse) {}
+}

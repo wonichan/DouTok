@@ -1,5 +1,6 @@
 package constants
 
 const (
-	Key_param = "key"
+	Key_param   = "key"
+	Group_param = "group"
 )

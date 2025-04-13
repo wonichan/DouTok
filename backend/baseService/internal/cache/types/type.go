@@ -21,5 +21,6 @@ type PeerGetter interface {
 type Entry struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
+	Group string `json:"group"`
 	TTL   int64  `json:"ttl"`
 }

@@ -77,6 +77,7 @@ func (cn *CacheNode) Get(key string) (kv *types.KvStore, ok bool) {
 }
 
 func (cn *CacheNode) Set(key string, value *types.KvStore) {
+	logger.GetLogger().Infof("set cache to lru cache, ttl:%v", value.LifeTime+cn.delayTTL)
 	_ = cn.cache.SetWithTTL(key, value, value.Length(), value.LifeTime+cn.delayTTL)
 	cn.stats.WriteCount++
 }

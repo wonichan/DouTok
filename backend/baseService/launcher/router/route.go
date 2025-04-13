@@ -11,6 +11,6 @@ func RegisterRouter(h *server.Hertz) {
 	v1 := h.Group("/v1")
 	{
 		v1.POST("/store", cache.Store)
-		v1.GET("/get/:key", cache.Get)
+		v1.GET("/get/:group/:key", cache.Get)
 	}
 }
