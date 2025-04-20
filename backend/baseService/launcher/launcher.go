@@ -18,7 +18,7 @@ type Launcher struct {
 func New() *Launcher {
 	launcher := new(Launcher)
 	launcher.serverHertz = server.Default(
-		server.WithHostPorts("127.0.0.1:8001"),
+		server.WithHostPorts("127.0.0.1:8000"),
 		server.WithKeepAlive(true),
 		server.WithReadTimeout(60*time.Second),
 		server.WithWriteTimeout(60*time.Second),

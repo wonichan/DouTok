@@ -22,7 +22,6 @@ import (
 
 const (
 	defaultReplicas = 50
-	self            = "node1"
 )
 
 type CacheNodesPool struct {
@@ -48,7 +47,7 @@ func (p *CacheNodesPool) AddNodes(addrs ...string) {
 func (p *CacheNodesPool) PickPeer(key string) (types.PeerGetter, bool) {
 	p.RLock()
 	defer p.RUnlock()
-	if addr := p.hashRing.Get(key); addr != "" && addr != self {
+	if addr := p.hashRing.Get(key); addr != "" && addr != selfNode {
 		if peer, ok := p.Nodes[addr]; ok {
 			return peer, true
 		}

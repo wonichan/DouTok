@@ -22,7 +22,7 @@ var (
 
 const (
 	selfGroup = "test"
-	selfNode  = "127.0.0.1:9001"
+	selfNode  = "127.0.0.1:9000"
 )
 
 func init() {
