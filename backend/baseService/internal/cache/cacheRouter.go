@@ -20,23 +20,21 @@ var (
 	once sync.Once
 )
 
-const (
+var (
 	selfGroup = "test"
 	selfNode  = "127.0.0.1:9000"
 )
 
-func init() {
+func Init(addrs []string, group string, opts ...config.Option) {
+	selfNode = addrs[0]
+	selfGroup = group
 	once.Do(func() {
-		NewCacheGroupPool("test", config.WithCacheSize(1000))
-		RegisterNode()
+		NewCacheGroupPool(selfGroup, opts...)
+		RegisterNode(addrs...)
 	})
 }
 
-func RegisterNode() {
-	addrs := []string{
-		"127.0.0.1:9000",
-		"127.0.0.1:9001",
-	}
+func RegisterNode(addrs ...string) {
 	cacheNodePool := NewCacheNodesPool()
 	cacheNodePool.AddNodes(addrs...)
 	GetCacheGroup(selfGroup).RegisterNode(cacheNodePool)

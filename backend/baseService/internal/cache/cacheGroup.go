@@ -1,15 +1,16 @@
 package cache
 
 import (
-	"DouTok-example/backend/baseService/internal/cache/config"
-	"DouTok-example/backend/baseService/internal/cache/singleflight"
-	"DouTok-example/backend/baseService/internal/cache/types"
-	"DouTok-example/backend/baseService/internal/logger"
 	"context"
 	"sync"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/common/json"
+
+	"DouTok-example/backend/baseService/internal/cache/config"
+	"DouTok-example/backend/baseService/internal/cache/types"
+	"DouTok-example/backend/baseService/internal/logger"
+	"DouTok-example/backend/common/singleflight"
 )
 
 var (
