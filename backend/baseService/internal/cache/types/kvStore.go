@@ -8,7 +8,7 @@ import (
 type KvStore struct {
 	Key        string        `json:"key"`
 	Value      ByteView      `json:"value"`
-	LifeTime   time.Duration `json:"lifeTime"`
+	LifeTime   time.Duration `json:"lifeTime"` // 单位秒
 	UpdateTime time.Time     `json:"updateTime"`
 }
 
